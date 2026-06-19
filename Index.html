@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Resizer - A4 with Orientation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <style>
+        body {font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f4f4f4;}
+        .container {background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);}
+        h1 {text-align: center; color: #333;}
+        input, button {margin: 10px 0; padding: 10px; width: 100%; box-sizing: border-box;}
+        button {background: #007bff; color: white; border: none; cursor: pointer; font-size: 16px;}
+        button:hover {background: #0056b3;}
+        button:disabled {background: #ccc; cursor: not-allowed;}
+        #status {margin: 10px 0; padding: 10px; border-radius: 5px;}
+        .success {background: #d4edda; color: #155724;}
+        .error {background: #f8d7da; color: #721c24;}
+        .info {background: #d1ecf1; color: #0c5460;}
+        .options {display: flex; gap: 20px; flex-wrap: wrap; margin: 15px 0;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF Resizer to A4</h1>
+        <p style="text-align: center;">Upload PDF • Choose Orientation • Resize Pages • Download<br>Works offline after first visit</p>
+        
+        <input type="file" id="fileInput" accept="application/pdf">
+        
+        <div class="options">
+            <div><strong>Paper Size:</strong> A4</div>
+            <div>
+                <strong>Orientation:</strong><br>
+                <label><input type="radio" name="orientation" value="portrait" checked> Portrait</label><br>
+                <label><input type="radio" name="orientation" value="landscape"> Landscape</label>
+            </div>
+        </div>
+        
+        <button id="processBtn" disabled>Process & Resize PDF</button>
+        
+        <div id="status"></div>
+        
+        <a id="downloadLink" style="display:none; text-decoration: none;" download>
+            <button style="background: #28a745; width: auto; display: inline-block;">⬇️ Download Resized PDF</button>
+        </a>
+        
+        <div style="margin-top: 20px; font-size: 0.9em; color: #666;">
+            Content is scaled to fit A4 (preserves aspect ratio, centered).
+        </div>
+    </div>
+
+    <script>
+        const { PDFDocument } = PDFLib;
+        const fileInput = document.getElementById('fileInput');
+        const processBtn = document.getElementById('processBtn');
+        const statusEl = document.getElementById('status');
+        const downloadLink = document.getElementById('downloadLink');
+
+        let loadedPdfDoc = null;
+        let originalName = '';
+
+        const sizes = {
+            portrait: { width: 595.276, height: 841.89 },
+            landscape: { width: 841.89, height: 595.276 }
+        };
+
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            originalName = file.name.replace(/\.pdf$/i, '') || 'document';
+            statusEl.textContent = 'Loading PDF...'; statusEl.className = 'info';
+            try {
+                const bytes = await file.arrayBuffer();
+                loadedPdfDoc = await PDFDocument.load(bytes, { ignoreEncryption: true });
+                processBtn.disabled = false;
+                statusEl.textContent = `Loaded ${loadedPdfDoc.getPageCount()} page(s). Choose orientation and click Process.`;
+                statusEl.className = 'success';
+            } catch (err) {
+                statusEl.textContent = 'Failed to load PDF.'; statusEl.className = 'error';
+            }
+        });
+
+        processBtn.addEventListener('click', async () => {
+            if (!loadedPdfDoc) return;
+            const orient = document.querySelector('input[name="orientation"]:checked').value;
+            const target = sizes[orient];
+            statusEl.textContent = 'Resizing...'; statusEl.className = 'info';
+            processBtn.disabled = true;
+
+            try {
+                const newPdf = await PDFDocument.create();
+                const pages = loadedPdfDoc.getPages();
+                
+                for (let oldPage of pages) {
+                    const { width: ow, height: oh } = oldPage.getSize();
+                    const embedded = await newPdf.embedPage(oldPage);
+                    const newPage = newPdf.addPage([target.width, target.height]);
+                    
+                    const scale = Math.min(target.width / ow, target.height / oh) * 0.98;
+                    const sw = ow * scale, sh = oh * scale;
+                    const x = (target.width - sw) / 2;
+                    const y = (target.height - sh) / 2;
+                    
+                    newPage.drawPage(embedded, { x, y, width: sw, height: sh });
+                }
+                
+                const pdfBytes = await newPdf.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                
+                downloadLink.href = url;
+                downloadLink.download = `\( {originalName}_A4_ \){orient}.pdf`;
+                downloadLink.style.display = 'inline-block';
+                
+                statusEl.innerHTML = `✅ Done! Resized to A4 ${orient}.`;
+                statusEl.className = 'success';
+            } catch (err) {
+                statusEl.textContent = 'Error: ' + err.message; statusEl.className = 'error';
+            } finally {
+                processBtn.disabled = false;
+            }
+        });
+
+        // Offline caching
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
