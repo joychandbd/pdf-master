@@ -3,40 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Master Pro</title>
+    <title>PDF Master Pro - Offline PDF Tools</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';</script>
 </head>
-<body>
-    <div class="container">
-        <h1>📄 PDF Master Pro</h1>
-        <p style="text-align:center; color:#555;">অফলাইন • মডুলার • এক্সটেন্সিবল</p>
-
-        <div id="dropZone" class="drop-zone">
-            <p>🔗PDF ফাইল ড্র্যাগ করুন অথবা ক্লিক করুন</p>
-            <input type="file" id="fileInput" multiple accept="application/pdf" style="display:none;">
+<body class="dark-theme">
+    <header class="app-header">
+        <div class="logo-area">
+            <h1>PDF Master Pro <span class="subtitle">| অফলাইন পিডিএফ টুলস</span></h1>
         </div>
-
-        <div class="options" id="optionsPanel"></div>
-
-        <div class="controls">
-            <button class="primary" id="processBtn" disabled>🚀 প্রসেস করুন</button>
-            <button id="resetBtn">রিসেট</button>
-            <label><input type="checkbox" id="darkMode"> ডার্ক মোড</label>
+        <div class="header-controls">
+            <button id="theme-toggle" class="btn btn-secondary">🌓 Toggle Mode</button>
         </div>
+    </header>
 
-        <div id="status"></div>
-        <div class="progress"><div id="progressBar" class="progress-bar"></div></div>
-        <div id="preview" class="preview"></div>
+    <main class="app-container">
+        <aside class="control-panel">
+            <section class="panel-section">
+                <h3>📄 পেপার সাইজ ও লেআউট (Layout)</h3>
+                <div class="form-group">
+                    <label for="paper-size">সাইজ (Size):</label>
+                    <select id="paper-size" class="form-control">
+                        <option value="A4" selected>A4 (210 × 297mm)</option>
+                        <option value="A3">A3 (297 × 420mm)</option>
+                        <option value="A5">A5 (148 × 210mm)</option>
+                        <option value="Letter">Letter (8.5 × 11in)</option>
+                        <option value="Legal">Legal (8.5 × 14in)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ওরিয়েন্টেশন (Orientation):</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="orientation" value="portrait" checked> পোর্ট্রেট (Portrait)</label>
+                        <label><input type="radio" name="orientation" value="landscape"> ল্যান্ডস্কেপ (Landscape)</label>
+                    </div>
+                </div>
+            </section>
 
-        <a id="downloadLink" style="display:none;" download>
-            <button class="success">⬇️ ডাউনলোড করুন</button>
-        </a>
-    </div>
+            <div id="dynamic-features">
+                </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    
-    <!-- মেইন স্ক্রিপ্ট -->
+            <div class="action-zone">
+                <button id="btn-process" class="btn btn-primary btn-block" disabled>🚀 প্রসেস করুন (Process PDF)</button>
+                <button id="btn-reset" class="btn btn-danger btn-block">🔄 রিসেট (Reset)</button>
+            </div>
+
+            <div id="status-container" class="hidden">
+                <div class="progress-bar-container">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+                <p id="status-message"></p>
+            </div>
+        </aside>
+
+        <section class="workspace">
+            <div id="drop-zone" class="drop-zone">
+                <div class="drop-zone-content">
+                    <svg class="upload-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+                    <p>পিডিএফ ফাইল এখানে ড্রপ করুন অথবা ক্লিক করে আপলোড করুন</p>
+                    <span class="btn btn-secondary">ফাইল সিলেক্ট করুন (Select PDFs)</span>
+                    <input type="file" id="file-input" accept="application/pdf" multiple style="display: none;">
+                </div>
+            </div>
+
+            <div id="preview-container" class="preview-container hidden">
+                <h3>📋 ফাইল প্রিভিউ (Previews)</h3>
+                <div id="preview-grid" class="preview-grid"></div>
+            </div>
+        </section>
+    </main>
+
     <script src="script.js" type="module"></script>
 </body>
 </html>
