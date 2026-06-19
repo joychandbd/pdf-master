@@ -3,70 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Master Pro - Final</title>
+    <title>PDF Master Pro</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <h1>📄 PDF Master Pro</h1>
-        <p style="text-align:center; color:#555;">অফলাইন • হেডার • ফুটার • লোগো • ওয়াটারমার্ক</p>
+        <p style="text-align:center; color:#555;">অফলাইন • মডুলার • এক্সটেন্সিবল</p>
 
         <div id="dropZone" class="drop-zone">
-            <p>PDF ফাইলগুলো এখানে ড্র্যাগ করুন অথবা ক্লিক করে সিলেক্ট করুন</p>
+            <p>PDF ফাইল ড্র্যাগ করুন অথবা ক্লিক করুন</p>
             <input type="file" id="fileInput" multiple accept="application/pdf" style="display:none;">
         </div>
 
-        <div class="options">
-            <div>
-                <label>পেপার সাইজ</label>
-                <select id="paperSize">
-                    <option value="a4">A4</option>
-                    <option value="a3">A3</option>
-                    <option value="a5">A5</option>
-                    <option value="letter">Letter</option>
-                    <option value="legal">Legal</option>
-                </select>
-            </div>
-            <div>
-                <label>ওরিয়েন্টেশন</label><br>
-                <label><input type="radio" name="orient" value="portrait" checked> Portrait</label>
-                <label><input type="radio" name="orient" value="landscape"> Landscape</label>
-            </div>
-            <div>
-                <label>হেডার টেক্সট</label>
-                <input type="text" id="headerText" placeholder="কোম্পানির নাম বা টাইটেল">
-            </div>
-            <div>
-                <label>ফুটার টেক্সট</label>
-                <input type="text" id="footerText" placeholder="পৃষ্ঠা {page} / {total}">
-            </div>
-            <div>
-                <label>লোগো আপলোড (PNG/JPG)</label>
-                <input type="file" id="logoInput" accept="image/*">
-                <div id="logoPreview"></div>
-            </div>
-            <div>
-                <label>লোগো পজিশন</label>
-                <select id="logoPosition">
-                    <option value="header">হেডারে</option>
-                    <option value="footer">ফুটারে</option>
-                    <option value="watermark" selected>ওয়াটারমার্ক</option>
-                </select>
-            </div>
-            <div>
-                <label>লোগো সাইজ</label>
-                <input type="range" id="logoSize" min="8" max="45" value="18"> 
-                <span id="logoSizeVal">18%</span>
-            </div>
-            <div>
-                <label>ওয়াটারমার্ক অপাসিটি</label>
-                <input type="range" id="wmOpacity" min="10" max="60" value="30"> 
-                <span id="wmOpacityVal">30%</span>
-            </div>
-        </div>
+        <div class="options" id="optionsPanel"></div>
 
         <div class="controls">
-            <button class="primary" id="processBtn" disabled>🚀 প্রসেস করুন ও ডাউনলোড করুন</button>
+            <button class="primary" id="processBtn" disabled>🚀 প্রসেস করুন</button>
             <button id="resetBtn">রিসেট</button>
             <label><input type="checkbox" id="darkMode"> ডার্ক মোড</label>
         </div>
@@ -82,6 +35,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="script.js"></script>
+    
+    <!-- মেইন স্ক্রিপ্ট -->
+    <script src="script.js" type="module"></script>
 </body>
 </html>
